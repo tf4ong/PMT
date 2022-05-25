@@ -195,10 +195,10 @@ from prt_utils.extract_frames2label import extract_frames
 import scripts.voc_convert as vc
 import prt_utils.train_utils as train_utils
 from random import shuffle
-from mAP import eval_tools as et
+#from mAP import eval_tools as et
 
-still mising conversion of pvoc file in the labelimg pathway
-can now work with the Vott generated Pascal VOC format 
+#still mising conversion of pvoc file in the labelimg pathway
+#can now work with the Vott generated Pascal VOC format 
 
 
 class PRT_train:
