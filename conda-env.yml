@@ -1,0 +1,21 @@
+name: PyRodentTracks
+
+dependencies:
+  - python==3.7
+  - ffmpeg
+  - pip
+  - matplotlib
+  - opencv
+  - cudnn
+  - spyder
+  - cudatoolkit==10.1.243
+  - pip:
+    - tensorflow-gpu==2.3.1
+    - opencv-python==4.1.1.26
+    - lxml
+    - tqdm
+    - absl-py
+    - easydict
+    - pillow
+    - filterpy
+    - imutils
