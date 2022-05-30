@@ -26,11 +26,17 @@ def generate_sets(vid_fold,train_frac,dest):
     set_text(test_ims,'test',dest)
     for i in train_ims:
         textfile = f'{i[:-4]}.txt'
-        shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}train_set/{textfile }')
+        try:
+            shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}train_set/{textfile }')
+        except Exception as e:
+            open(f'{dest}train_set/{i[:-4]}.txt').close()
         shutil.copyfile(f'{vid_fold}/{i}', f'{dest}train_set/{i}')
     for i in test_ims:
         textfile = f'{i[:-4]}.txt'
-        shutil.copyfile(f'{vid_fold}/{i}', f'{dest}test_set/{i}')
+        try:
+            shutil.copyfile(f'{vid_fold}/{i}', f'{dest}test_set/{i}')
+        except Exception as e:
+            open(f'{dest}test_set/{i[:-4]}.txt').close()
         shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}test_set/{textfile }')
 
 

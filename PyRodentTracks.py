@@ -245,10 +245,27 @@ class PRT_train:
         print('Finished extracting frames from videos')
         print('label frames with labelimg using label_imgs() or use another too1649974680_img4l which generates Pascal VOC format')
     def label_imgs(self):
+        temp_vid = self.vid_folder
+        temp_main = self.main_folder
         if os.listdir(self.vid_folder) ==0:
             print('extract images to label by running extractframes')
             return
-        os.system(f'labelImg {self.vid_folder} {self.main_folder}/names.txt')
+        if ' ' in self.vid_folder or '' in self.main_folder: 
+            space_pos = [i for i,v in enumerate(self.vid_folder) if v == ' ']
+            space_pos2 = [i for i,v in enumerate(self.main_folder) if v == ' ']
+            l1=[s for s in self.vid_folder]
+            l2=[s for s in self.self.main_folder]
+            spacer=0
+            spacer2=0
+            for i in space_pos:
+                l1.insert(i+spacer, '\\')
+                spacer+=1
+            for i in space_pos2:
+                l2.insert(i+spacer2, '\\')
+                spacer2+=1
+            temp_vid = ''.join(l1)
+            temp_main = ''.join(l2)
+        os.system(f'labelImg {temp_vid} {temp_main}/names.txt')
         return
     def evaluate_weights(self):
         if not os.path.exists(self.train+'evaluation'):
