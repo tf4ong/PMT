@@ -16,7 +16,7 @@ import os
 
 
 def generate_RFID_video(path,df_RFID,tags,df_tracks_out,validation_frames,config_dict_analysis,config_dic_dlc,dlc_bpts=False,
-                        plot_motion=False,out_folder=None):
+                        plot_motion=False,out_folder=None,plot_readers=True):
     frame_count=0
     RFID_coords=config_dict_analysis['RFID_readers']
     entrance_reader=config_dict_analysis['entrance_reader']
@@ -91,14 +91,15 @@ def generate_RFID_video(path,df_RFID,tags,df_tracks_out,validation_frames,config
                     cv2.putText(blankimg,f'Frame {RFID_frame}: reader {reader_display},tag read {m_display}', \
                                 (25,int(1.4*height+spacer)),0,5e-3 * 180,(0,0,255),3)
                     spacer+=10
-            for i,v in RFID_coords.items():
-                if i!=entrance_reader:
-                    xmin, ymin, xmax, ymax=v[0],v[1],v[2],v[3]
-                    cv2.rectangle(blankimg, (xmin+100, ymin+100), (xmax+100, ymax+100), (0,0,0), 2)
-                    cent_point=bbox_to_centroid(v)
-                    #print(i)
-                    #print(cent_point[0])
-                    cv2.putText(blankimg,f"{str(i)}",(int(cent_point[0])+100,int(cent_point[1])+100),0, 5e-3 * 200,(0,0,0),2)
+            if plot_readers:
+                for i,v in RFID_coords.items():
+                    if i!=entrance_reader:
+                        xmin, ymin, xmax, ymax=v[0],v[1],v[2],v[3]
+                        cv2.rectangle(blankimg, (xmin+100, ymin+100), (xmax+100, ymax+100), (0,0,0), 2)
+                        cent_point=bbox_to_centroid(v)
+                        #print(i)
+                        #print(cent_point[0])
+                        cv2.putText(blankimg,f"{str(i)}",(int(cent_point[0])+100,int(cent_point[1])+100),0, 5e-3 * 200,(0,0,0),2)
             if plot_motion:
                 if MS =='Motion':
                     for c in motion_rois[frame_count]:
@@ -139,7 +140,7 @@ def generate_RFID_video(path,df_RFID,tags,df_tracks_out,validation_frames,config
     out.release()
     vid.release()
     
-def create_validation_Video(folder,df1,tags,config_dic,output=None):
+def create_validation_Video(folder,df1,tags,config_dic,output=None,plot_readers=True):
     if output is None:
         output = folder
     #output='/media/tony/data/data/test_tracks/vertification/older_coords/vertifications'
@@ -224,12 +225,13 @@ def create_validation_Video(folder,df1,tags,config_dic,output=None):
                     int(objects[2]), int(objects[3]), int(objects[4])
                 cv2.rectangle(img_yolo, (xmin, ymin), (xmax, ymax), (0,255,0), 3)    
                 cv2.putText(img_yolo, str(index), (xmin, ymin+10), 0, 5e-3 * 200, (0,0,255), 3)
-            for i,v in RFID_coords.items():
-                if i!=entrance_reader:
-                    xmin, ymin, xmax, ymax=v[0],v[1],v[2],v[3]
-                    cv2.rectangle(img_rfid, (xmin, ymin), (xmax, ymax), (0,0,255), 3)
-                    cent_point=bbox_to_centroid(v)
-                    cv2.putText(img_rfid,f"{str(i)}",(int(cent_point[0]),int(cent_point[1])),0, 5e-3 * 200,(0,0,255),3)
+            if plot_readers:
+                for i,v in RFID_coords.items():
+                    if i!=entrance_reader:
+                        xmin, ymin, xmax, ymax=v[0],v[1],v[2],v[3]
+                        cv2.rectangle(img_rfid, (xmin, ymin), (xmax, ymax), (0,0,255), 3)
+                        cent_point=bbox_to_centroid(v)
+                        cv2.putText(img_rfid,f"{str(i)}",(int(cent_point[0]),int(cent_point[1])),0, 5e-3 * 200,(0,0,255),3)
             if 3*width +100<2800:
                 width_b=2300
             else:

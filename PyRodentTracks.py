@@ -18,7 +18,7 @@ may need adiitionl methods for faster inference if long videos
 faster framerate mayhelp, only tested upto 40fps
 """
 class PRT_analysis:
-    def __init__(self,path,config_path):
+    def __init__(self,path,config_path,n_mice,rfid_tags):
         self.path=path 
         with open(path+'/'+'logs.txt','r') as f:
             tags=f.readlines()
@@ -36,6 +36,13 @@ class PRT_analysis:
             #    self.load_data()
             #else:
             #    pass
+        if os.path.exists(self.path+'/logs.txt'):
+            tags = [str(i) for i in rfid_tags]]
+            tags = ','.join(tags)
+            with open(self.path+'/logs.txt','w') as f:
+                 file.write(f'mice:{n_mice}')
+                 for tag in rfid_tags:
+                    file.write(f'Tags: {tags}')
         return
     def load_data(self):
         convert_dict={'sort_tracks':eval,'RFID_tracks':eval,'ious_interaction':eval,
