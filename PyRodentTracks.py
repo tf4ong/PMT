@@ -37,7 +37,7 @@ class PRT_analysis:
             #else:
             #    pass
         if os.path.exists(self.path+'/logs.txt'):
-            tags = [str(i) for i in rfid_tags]]
+            tags = [str(i) for i in rfid_tags]
             tags = ','.join(tags)
             with open(self.path+'/logs.txt','w') as f:
                  file.write(f'mice:{n_mice}')
@@ -261,7 +261,7 @@ class PRT_train:
             space_pos = [i for i,v in enumerate(self.vid_folder) if v == ' ']
             space_pos2 = [i for i,v in enumerate(self.main_folder) if v == ' ']
             l1=[s for s in self.vid_folder]
-            l2=[s for s in self.self.main_folder]
+            l2=[s for s in self.main_folder]
             spacer=0
             spacer2=0
             for i in space_pos:
@@ -283,7 +283,7 @@ class PRT_train:
             raise Exception('No ground truth labels found, check if there are label images')
         self.config_dic_detect=config_loader.detect_config_loader(self.config_path)
         img_list = [self.vid_folder + i for i in os.listdir(self.vid_folder) if i[-4:]=='.png' or i[-4:]='.jpg']
-        predicts = du.yolov4_detect_images(img_list,self.config_dic_detect,self.eval,save_out=True)
+        predicts_dic = du.yolov4_detect_images(img_list,self.config_dic_detect,self.eval,save_out=True)
 
     def pvocTrainImport(self,pvoc_path):
         ims = vc.get_labled_imgs(pvoc_path)
