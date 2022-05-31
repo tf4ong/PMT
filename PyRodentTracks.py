@@ -195,8 +195,8 @@ from prt_utils.extract_frames2label import extract_frames
 import scripts.voc_convert as vc
 import prt_utils.train_utils as train_utils
 from random import shuffle
-#from mAP import eval_tools as et
-
+from mAP import eval_tools as et
+from prt_utils import detect_utils as du
 #still mising conversion of pvoc file in the labelimg pathway
 #can now work with the Vott generated Pascal VOC format 
 
@@ -270,12 +270,13 @@ class PRT_train:
     def evaluate_weights(self):
         if not os.path.exists(self.train+'evaluation'):
             os.mkdir(self.train+'evaluation')
-        self.eval = self.train+'evaluation'
+        self.eval = self.train+'evaluation/'
         ground_truth_dic = et.read_gt(self.vid_folder)
         if len(ground_truth_dic) == 0:
             raise Exception('No ground truth labels found, check if there are label images')
-        self.config_dic_detect=config_loader.detect_config_loader(config_path)
-        #yolov4_detect(self.path,self.config_dic_detect,write_vid)
+        self.config_dic_detect=config_loader.detect_config_loader(self.config_path)
+        img_list = [self.vid_folder + i for i in os.listdir(self.vid_folder) if i[-4:]=='.png' or i[-4:]='.jpg']
+        predicts = du.yolov4_detect_images(img_list,self.config_dic_detect,self.eval,save_out=True)
 
     def pvocTrainImport(self,pvoc_path):
         ims = vc.get_labled_imgs(pvoc_path)

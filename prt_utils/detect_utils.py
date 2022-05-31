@@ -158,7 +158,7 @@ def yolov4_detect_vid(folder,config_dic_detect,write_vid=False):
                 score_threshold=score
                 )
             pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(), valid_detections.numpy()]
-            image = utils.draw_bbox(frame,pred_bbox,config_dic_detect['framework'], pred_bbox)
+            image = utils.draw_bbox(frame,pred_bbox,config_dic_detect['classes'])
             avg, status,cnt_bb= utils.motion_detection(frame,avg,k_size=(blur_filter_k_size,blur_filter_k_size),
                                                        min_area=motion_area_thresh,intensity_thres=intensity_thres)
             with open(folder+'/yolo_dets.csv','a') as file:
@@ -219,7 +219,7 @@ def yolov4_detect_vid(folder,config_dic_detect,write_vid=False):
                 print('Adjust Parameters as needed')
                 out.release()
                 break
-def yolov4_detect_images(img_list,config_dic_detect,save_out=None):
+def yolov4_detect_images(img_list,config_dic_detect,save_folder,save_out=True):
     size=config_dic_detect['size']
     weightspath=config_dic_detect['weightpath'][0]
     iou=config_dic_detect['iou']
@@ -231,6 +231,7 @@ def yolov4_detect_images(img_list,config_dic_detect,save_out=None):
     input_size = size
     saved_model_loaded = tf.saved_model.load(weightspath, tags=[tag_constants.SERVING])
     infer = saved_model_loaded.signatures['serving_default']
+    prediction_results = {}
     for img in img_list:
         frame = cv2.imread(img)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -254,4 +255,15 @@ def yolov4_detect_images(img_list,config_dic_detect,save_out=None):
             score_threshold=score
             )
         pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(), valid_detections.numpy()]
-        image = utils.draw_bbox(frame,pred_bbox,config_dic_detect['framework'], pred_bbox)
+        image = utils.draw_bbox(frame,pred_bbox,config_dic_detect['classes'])
+        prediction_results[img] = image[1]
+    with open(save_folder+'/predicts.csv','w') as file:
+        file.write('img,predicts\n')
+    with open(save_folder+'/predicts.csv','a') as file: 
+        for i,v in prediction_results.items():
+            file.write(f'{i},"{v}"\n')
+    #if save_out:
+    #    df = pd.DataFrame.from_dict(prediction_results)
+    #    df = df.reset_index()
+    #    df.to_csv(f'{save_folder}/pred_results.csv')
+    return prediction_results 

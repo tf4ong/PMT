@@ -13,6 +13,8 @@ def detect_config_loader(path):
     config_dic['classes'] = str(config.get(cfg, 'classes'))
     if ',' in config_dic['classes']:
         config_dic['classes'] = config_dic['classes'].split(',')
+    else:
+        config_dic['classes'] = [config_dic['classes']]
     config_dic['weightpath']=str(config.get(cfg, 'weightpath')).split(',')
     config_dic['score']=float(config.get(cfg, 'score'))
     config_dic['iou']=float(config.get(cfg, 'iou'))
