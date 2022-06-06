@@ -36,7 +36,7 @@ class PRT_analysis:
             #    self.load_data()
             #else:
             #    pass
-        if os.path.exists(self.path+'/logs.txt'):
+        if not os.path.exists(self.path+'/logs.txt'):
             tags = [str(i) for i in rfid_tags]
             tags = ','.join(tags)
             with open(self.path+'/logs.txt','w') as f:
@@ -205,7 +205,6 @@ from random import shuffle
 from mAP import eval_tools as et
 from prt_utils import detect_utils as du
 #still mising conversion of pvoc file in the labelimg pathway
-#can now work with the Vott generated Pascal VOC format 
 
 
 class PRT_train:
@@ -274,18 +273,41 @@ class PRT_train:
             temp_main = ''.join(l2)
         os.system(f'labelImg {temp_vid} {temp_main}/names.txt')
         return
-    def evaluate_weights(self):
-        if not os.path.exists(self.train+'evaluation'):
-            os.mkdir(self.train+'evaluation')
-        self.eval = self.train+'evaluation/'
+
+    def evaluate_weights(self,plot_predict=True):
+        self.evaluate_path = self.main_folder+'/evaulation_results'
+        self.config_dic_detect=config_loader.detect_config_loader(self.config_path)
+        if not os.path.exists(self.evaluate_path):
+            os.mkdir(self.evaluate_path)
+        weight_name = os.path.basename(self.config_dic_detect['weightpath'][0]) 
+        results_path = self.evaluate_path+'/'+ weight_name
+        if not os.path.exists(results_path):
+            os.mkdir(results_path)
         ground_truth_dic = et.read_gt(self.vid_folder)
         if len(ground_truth_dic) == 0:
             raise Exception('No ground truth labels found, check if there are label images')
-        self.config_dic_detect=config_loader.detect_config_loader(self.config_path)
-        img_list = [self.vid_folder + i for i in os.listdir(self.vid_folder) if i[-4:]=='.png' or i[-4:]='.jpg']
-        predicts_dic = du.yolov4_detect_images(img_list,self.config_dic_detect,self.eval,save_out=True)
+        img_list = [self.vid_folder +'/'+ i for i in os.listdir(self.vid_folder) if i[-4:]=='.png' or i[-4:]=='.jpg']
+        predicts_dic = du.yolov4_detect_images(img_list,self.config_dic_detect,results_path,save_out=True)
+        total_fn,total_fp,mean_ap = et.get_mAP(ground_truth_dic,predicts_dic)
+        print('#####################################################\n')
+        print(f"Results for weights at path: {self.config_dic_detect['weightpath'][0]}\n")
+        print(f"Score Threshold: {self.config_dic_detect['score']}, IOU Threshold: {self.config_dic_detect['iou']}\n")
+        print('Total false positive in this image set:',total_fp,'\n',
+            'Total false negative in this image set',total_fn,'\n',
+            'Mean average precision (mAP):',mean_ap)
+        if not os.path.exists(self.evaluate_path+'/results.csv'):
+            with open(self.evaluate_path+'/results.csv','w') as file:
+                file.write('weight,weight_path,score,iou,fn,fp,mAP\n')
+        with open(self.evaluate_path+'/results.csv','a') as file:
+            file.write(f"{weight_name},{self.config_dic_detect['weightpath'][0]},{self.config_dic_detect['score']},{self.config_dic_detect['iou']},{total_fp},{total_fn},{mean_ap}")
+        if plot_predict:
+            et.plt_results(predicts_dic,ground_truth_dic,results_path)
+        print('Test another weight and adjust score/iou threshold as necessary')
+        return 
 
     def pvocTrainImport(self,pvoc_path):
+        #coverts pvoc labels to train labels
+        # discarded due to train function not complete in tf2-yolov4
         ims = vc.get_labled_imgs(pvoc_path)
         shuffle(ims)
         train=int(len(ims)*self.config_dic_train['trainfraction']) 
@@ -298,6 +320,7 @@ class PRT_train:
         config_loader.set_value(self.config_path,'PRT_Train','trainpath_txt',self.train_txt)
         config_loader.set_value(self.config_path,'PRT_Train','testpath_text',self.eval_txt)
         print('Ready to train, export folder to darknet for trainning, good luck!')
+
     def generate_trainset(self):
         if not os.path.exists(f'{self.train}yolov4-obj.cfg'):
             shutil.copyfile('./configs/yolov4-obj.cfg',f'{self.train}yolov4-obj.cfg')
