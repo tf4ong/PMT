@@ -232,6 +232,7 @@ def yolov4_detect_images(img_list,config_dic_detect,save_folder,save_out=True):
     saved_model_loaded = tf.saved_model.load(weightspath, tags=[tag_constants.SERVING])
     infer = saved_model_loaded.signatures['serving_default']
     prediction_results = {}
+    pbar=tqdm(total=len(img_list),position=0,leave=True)
     for img in img_list:
         frame = cv2.imread(img)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -257,6 +258,7 @@ def yolov4_detect_images(img_list,config_dic_detect,save_folder,save_out=True):
         pred_bbox = [boxes.numpy(), scores.numpy(), classes.numpy(), valid_detections.numpy()]
         image = utils.draw_bbox(frame,pred_bbox,config_dic_detect['classes'])
         prediction_results[img] = image[1]
+        pbar.update(1)
     with open(save_folder+'/predicts.csv','w') as file:
         file.write('img,predicts\n')
     with open(save_folder+'/predicts.csv','a') as file: 
