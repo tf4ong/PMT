@@ -29,7 +29,7 @@ def generate_sets(vid_fold,train_frac,dest):
         try:
             shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}train_set/{textfile }')
         except Exception as e:
-            open(f'{dest}train_set/{i[:-4]}.txt').close()
+            open(f'{dest}train_set/{i[:-4]}.txt','w').close()
         shutil.copyfile(f'{vid_fold}/{i}', f'{dest}train_set/{i}')
     for i in test_ims:
         textfile = f'{i[:-4]}.txt'

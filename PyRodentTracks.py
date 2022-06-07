@@ -320,6 +320,7 @@ class PRT_train:
         config_loader.set_value(self.config_path,'PRT_Train','trainpath_txt',self.train_txt)
         config_loader.set_value(self.config_path,'PRT_Train','testpath_text',self.eval_txt)
         print('Ready to train, export folder to darknet for trainning, good luck!')
+        return
 
     def generate_trainset(self):
         if not os.path.exists(f'{self.train}yolov4-obj.cfg'):
