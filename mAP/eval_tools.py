@@ -43,11 +43,16 @@ def plt_results(pred_dic,ground_truth_dic,path):
     for i,v in pred_dic.items():
         bname = os.path.basename(i)
         img = cv2.imread(i)
-        gts = ground_truth_dic[i[:-4]+'.txt']
+        try:
+            gts = ground_truth_dic[i[:-4]+'.txt']
+            for gt in gts:
+                cv2.rectangle(img, (gt[0], gt[1]), (gt[2], gt[3]), (0,255,0), 3)
+        except Exception as e:
+            print(e)
+            print('no result text file found')
         for pred in v:
             cv2.rectangle(img, (pred[0], pred[1]), (pred[2], pred[3]), (0,0,255), 3)
-        for gt in gts:
-            cv2.rectangle(img, (gt[0], gt[1]), (gt[2], gt[3]), (0,255,0), 3)
+
         cv2.imwrite(path+'/labels'+f'/{bname}',img)
         pbar.update(1)
     print('Results can be viewed at {path}, green -> ground Truth; red -> predictions')
@@ -60,28 +65,33 @@ def gt_predicts_numpy(gt,predicts):
     # each element in the list is one frame
     pred_bboxes, pred_labels,pred_scores, gt_bboxes,gt_labels,gt_difficult = [],[],[],[],[],[]
     for idx, pred_each_frame in predicts.items():
-        gt_each_frame = gt[idx[:-4]+'.txt']
-        batch_size1 =  len(pred_each_frame)
-        batch_size2 =  len(gt_each_frame)
-        #assert(batch_size1 == batch_size2)
-        pred_bboxes_each_f  = np.zeros((batch_size1,4))
-        pred_labels_each_f  = np.zeros((batch_size1,1))
-        pred_scores_each_f  = np.zeros((batch_size1,1))
-        gt_bboxes_each_f    = np.zeros((batch_size2,4))
-        gt_labels_each_f    = np.zeros((batch_size2,1))
-        gt_difficult_each_f = np.zeros((batch_size2,1))
-        for i in range(batch_size1):
-            pred_bboxes_each_f[i,:]  = np.array(pred_each_frame[i][:4])
-            pred_bboxes_each_f[i,2:]+= 1 
-            pred_labels_each_f[i,:]  = np.array([0])
-            pred_scores_each_f[i,:]  = np.array(pred_each_frame[i][-2])
-        for j in range(batch_size2):
-            gt_bboxes_each_f[j,:]    = np.array(gt_each_frame[j][:4])
-            gt_bboxes_each_f[j,2:]  += 1
-            gt_labels_each_f[j,:]    = np.array(gt_each_frame[j][-1]) 
+        try:
+            gt_each_frame = gt[idx[:-4]+'.txt']
+            batch_size1 =  len(pred_each_frame)
+            batch_size2 =  len(gt_each_frame)
+            #assert(batch_size1 == batch_size2)
+            pred_bboxes_each_f  = np.zeros((batch_size1,4))
+            pred_labels_each_f  = np.zeros((batch_size1,1))
+            pred_scores_each_f  = np.zeros((batch_size1,1))
+            gt_bboxes_each_f    = np.zeros((batch_size2,4))
+            gt_labels_each_f    = np.zeros((batch_size2,1))
+            gt_difficult_each_f = np.zeros((batch_size2,1))
+            for i in range(batch_size1):
+                pred_bboxes_each_f[i,:]  = np.array(pred_each_frame[i][:4])
+                pred_bboxes_each_f[i,2:]+= 1 
+                pred_labels_each_f[i,:]  = np.array([0])
+                pred_scores_each_f[i,:]  = np.array(pred_each_frame[i][-2])
+            for j in range(batch_size2):
+                gt_bboxes_each_f[j,:]    = np.array(gt_each_frame[j][:4])
+                gt_bboxes_each_f[j,2:]  += 1
+                gt_labels_each_f[j,:]    = np.array(gt_each_frame[j][-1]) 
+                
             
-        
-        order = pred_scores_each_f.reshape(-1).argsort()[::-1]
+            order = pred_scores_each_f.reshape(-1).argsort()[::-1]
+        except Exception as e:
+            print(e)
+            print('no text file found continuing')
+            continue
         
         
         pred_bboxes.append(pred_bboxes_each_f[order])

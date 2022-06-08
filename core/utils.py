@@ -160,7 +160,7 @@ def draw_bbox(image, bboxes, classes, show_label=False):
             cv2.rectangle(image, c1, (np.float32(c3[0]), np.float32(c3[1])), bbox_color, -1) #filled
             cv2.putText(image, bbox_mess, (c1[0], np.float32(c1[1] - 2)), cv2.FONT_HERSHEY_SIMPLEX,
                         fontScale, (0, 0, 0), bbox_thick // 2, lineType=cv2.LINE_AA)
-        bbox_list.append([coor[1], coor[0],coor[3], coor[2],score,classes[class_ind]])
+        bbox_list.append([coor[1], coor[0],coor[3], coor[2],score])#,classes[class_ind]])
             
     return image,bbox_list
 

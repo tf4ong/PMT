@@ -173,7 +173,7 @@ def create_validation_Video(folder,df1,tags,config_dic,output=None,plot_readers=
     md_frames=[frame for frame in match_details.keys()]
     #corrections=df1.Correction.values
     #matched=df1.RFID_matched.values
-    vid=cv2.VideoCapture(folder+'/raw.avi')
+    vid=cv2.VideoCapture(folder+'/raw.mp4')
     vid_length=int(vid.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = int(vid.get(cv2.CAP_PROP_FPS))
     codec = cv2.VideoWriter_fourcc(*'XVID')

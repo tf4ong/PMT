@@ -30,13 +30,17 @@ def generate_sets(vid_fold,train_frac,dest):
             shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}train_set/{textfile }')
         except Exception as e:
             open(f'{dest}train_set/{i[:-4]}.txt','w').close()
+            shutil.copyfile(f'{vid_fold}/{i}', f'{dest}train_set/{i}')
+            continue
         shutil.copyfile(f'{vid_fold}/{i}', f'{dest}train_set/{i}')
     for i in test_ims:
         textfile = f'{i[:-4]}.txt'
         try:
             shutil.copyfile(f'{vid_fold}/{i}', f'{dest}test_set/{i}')
         except Exception as e:
-            open(f'{dest}test_set/{i[:-4]}.txt').close()
+            open(f'{dest}test_set/{i[:-4]}.txt','w').close()
+            shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}test_set/{textfile }')
+            continue
         shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}test_set/{textfile }')
 
 
@@ -79,7 +83,7 @@ def load_train_settings(train_config_dict,dest):
     lines[969]= f'classes={classes}\n'
     lines[1057]= f'classes={classes}\n'
     lines[1145]= f'classes={classes}\n'
-    with open (f'{dest}temp.cfg','w')as out:
+    with open (f'{dest}yolo4-obj.cfg','w')as out:
         for line in lines:
             out.write(line)
         out.close()

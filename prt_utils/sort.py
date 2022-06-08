@@ -209,6 +209,8 @@ class Sort(object):
         d = matched[np.where(matched[:,1]==t)[0],0]
         trk.update(dets[d,:][0])
     for i in unmatched_dets:
+        #print(dets)
+        #print(dets[i,:])
         trk = KalmanBoxTracker(dets[i,:])
         self.trackers.append(trk)
         #if self.frame_count >11050:

@@ -21,7 +21,8 @@ import ffmpy
 
 def convert2mp4(vid):
     #vid=vid_path +'/raw.h264'
-    ff = ffmpy.FFmpeg(inputs={f'{vid}': f' -i {vid}'}, outputs={f'{vid_path}/raw.mp4':'-vcodec copy'})
+    path = os.path.dirname(vid)+'/'
+    ff = ffmpy.FFmpeg(inputs={f'{vid}': f' -i {vid}'}, outputs={f'{path}/raw.mp4':'-vcodec copy'})
     try:
         ff.run()
         print('mp4 file generated')

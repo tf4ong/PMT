@@ -17,7 +17,8 @@ flags.DEFINE_string('model', 'yolov4', 'yolov3 or yolov4')
 
 def save_tf():
   ts = train_config_loader(FLAGS.config_file)
-  STRIDES, ANCHORS, NUM_CLASS, XYSCALE = utils.load_config(ts['model'],ts['classes'])
+  print()
+  STRIDES, ANCHORS, NUM_CLASS, XYSCALE = utils.load_config('yolov4',ts['classes'])
   input_layer = tf.keras.layers.Input([FLAGS.input_size, FLAGS.input_size, 3])
   feature_maps = YOLO(input_layer, NUM_CLASS, FLAGS.model, FLAGS.tiny)
   bbox_tensors = []
@@ -48,12 +49,9 @@ def save_tf():
     boxes, pred_conf = filter_boxes(pred_bbox, pred_prob, score_threshold=FLAGS.score_thres, input_shape=tf.constant([FLAGS.input_size, FLAGS.input_size]))
     pred = tf.concat([boxes, pred_conf], axis=-1)
   model = tf.keras.Model(input_layer, pred)
-  model.load_weights(FLAGS.weights)
-  #model.load(FLAGS.weights)
-  #utils.load_weights(model, FLAGS.weights, FLAGS.model, FLAGS.tiny)
+  utils.load_weights(model, FLAGS.weights, FLAGS.model, FLAGS.tiny)
   model.summary()
   model.save(FLAGS.output)
-  #model.save_weights()
 
 def main(_argv):
   save_tf()

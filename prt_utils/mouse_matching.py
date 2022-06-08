@@ -9,6 +9,7 @@ from prt_utils.sort import Sort
 from itertools import chain
 from decord import VideoReader
 from decord import cpu, gpu
+import os
 pd.options.mode.chained_assignment = None
 
 
@@ -24,7 +25,19 @@ def RFID_readout(pathin,config_dict_analysis,n_mice):
         2. ent_entrance reader number
     """
     #add datetime backin 
-    if n_mice != 1:
+    if n_mice ==1:
+        try:
+            df2=pd.read_csv(f'{pathin}/RFID_data_all.csv',index_col=False)
+            df2.Time=pd.to_datetime(df2['Time'],format="%Y-%m-%d_%H:%M:%S.%f")
+            df2['Time']=df2['Time'].astype(np.int64)/10**9
+        except Exception:
+            df2=pd.read_csv(f'{pathin}/timestamps.csv',index_col=False,skiprows=1)
+            df2['timestamp']=(df2['timestamp']-df2.iloc[0]['timestamp'])/1000000
+            with open(f'{pathin}/timestamps.csv') as f:
+                first_line = f.readline()
+            starttime=float(first_line[10:-2])
+            df2['Time']=df2['timestamp'] + starttime
+    else:
         ent_reader=config_dict_analysis['entrance_reader']
         time_thresh=config_dict_analysis['entrance_time_thres']
         try:
@@ -33,18 +46,19 @@ def RFID_readout(pathin,config_dict_analysis,n_mice):
             df1['Timestamp']=df1['Timestamp'].astype(np.int64)/10**9
         except Exception:
             df1=pd.read_csv(f'{pathin}/RFID_reads.csv',index_col=False)
+            df1=df1.rename(columns={'timestamp':'Timestamp'})
         try:
             df2=pd.read_csv(f'{pathin}/RFID_data_all.csv',index_col=False)
             df2.Time=pd.to_datetime(df2['Time'],format="%Y-%m-%d_%H:%M:%S.%f")
             df2['Time']=df2['Time'].astype(np.int64)/10**9
         except Exception:
-            print(2)
             df2=pd.read_csv(f'{pathin}/timestamps.csv',index_col=False,skiprows=1)
             df2['timestamp']=(df2['timestamp']-df2.iloc[0]['timestamp'])/1000000
             with open(f'{pathin}/timestamps.csv') as f:
                 first_line = f.readline()
             starttime=float(first_line[10:-2])
             df2['Time']=df2['timestamp'] + starttime
+        #print(df1.columns)
         df_ent_reader=df1.query(f'Reader =={str(ent_reader)}')
         ent_times=df_ent_reader.diff(axis=0)#.Timestamp.apply(lambda x: x.total_seconds())
         df1=df1.drop(df1.index[ent_times[ent_times.Timestamp<time_thresh].index],inplace=False)
@@ -74,23 +88,12 @@ def RFID_readout(pathin,config_dict_analysis,n_mice):
         except Exception:
             pass
         df2['frame']=range(len(df2))
-    else:
-        try:
-            df2=pd.read_csv(f'{pathin}/RFID_data_all.csv',index_col=False)
-            df2.Time=pd.to_datetime(df2['Time'],format="%Y-%m-%d_%H:%M:%S.%f")
-            df2['Time']=df2['Time'].astype(np.int64)/10**9
-        except Exception:
-            print(2)
-            df2=pd.read_csv(f'{pathin}/timestamps.csv',index_col=False,skiprows=1)
-            df2['timestamp']=(df2['timestamp']-df2.iloc[0]['timestamp'])/1000000
-            with open(f'{pathin}/timestamps.csv') as f:
-                first_line = f.readline()
-            starttime=float(first_line[10:-2])
-            df2['Time']=df2['timestamp'] + starttime
+    print(df2.columns)
     return df2
 
 def sort_tracks_generate(bboxes,resolution,area_thres,max_age,min_hits,iou_threshold,n_mice):
     #memory issues?
+    #bboxes=[track[:5] for track_list in bboxes for track in track_list]
     id_tracks=[]
     unmatched_predicts=[]
     mot_tracker=Sort(n_mice,max_age,min_hits,iou_threshold)
@@ -130,7 +133,10 @@ def read_yolotracks(pathin,config_dict_analysis,config_dict_tracking,df_RFID,n_m
     columns=['frame','bboxes','motion_roi']
     dics={i: eval for i in columns}
     df_tracks=pd.read_csv(pathin+'/'+'yolo_dets.csv',converters=dics)
+    #####################################################
+    ####################################################
     bboxes=[track for track_list in df_tracks['bboxes'].values for track in track_list]
+    #print(bboxes)
     areas=[bbox_area(bbox) for bbox in bboxes]
     area_thresh=[0.75*min(areas),max(areas)]
     df_tracks['bboxes']=[mouse_limiter(bbs,n_mice) for bbs in df_tracks['bboxes'].values]
@@ -473,6 +479,8 @@ def Combine_RFIDreads(df,df_RFID_cage):
     length=min([len(df),len(df_RFID_cage)])
     df=df[:length]
     df_RFID_cage=df_RFID_cage[:length]
+    print(df_RFID_cage.columns)
+    print(df.columns)
     df=pd.merge(df,df_RFID_cage, on='frame')
     df['RFID_tracks']=[list() for i in range(len(df.index))]
     df['RFID_matched']=[list() for i in range(len(df.index))]
@@ -827,7 +835,7 @@ def get_tracked_activity(motion_status,motion_roi,RFID_tracks,tags):
 
 def bbox_revised(df_tracks,df_RFID,RFID_coords,entrance_reader,thresh,threshold,ent_thres,n_mice,pathin,area_thres,resolution):
     vid_path=pathin+'/raw.avi'
-    if not os.exists(vid_path):
+    if not os.path.exists(vid_path):
         vid_path=pathin+'/raw.mp4'
     combined_df=Combine_RFIDreads(df_tracks,df_RFID)
     if n_mice !=1:

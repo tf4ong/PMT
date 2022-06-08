@@ -20,9 +20,6 @@ faster framerate mayhelp, only tested upto 40fps
 class PRT_analysis:
     def __init__(self,path,config_path,n_mice,rfid_tags):
         self.path=path 
-        with open(path+'/'+'logs.txt','r') as f:
-            tags=f.readlines()
-            self.tags=[int(i) for i in tags[1][6:].split(',')]
         self.config_path=config_path
         self.config_dic_analysis=config_loader.analysis_config_loader(config_path)
         self.config_dic_detect=config_loader.detect_config_loader(config_path)
@@ -38,11 +35,17 @@ class PRT_analysis:
             #    pass
         if not os.path.exists(self.path+'/logs.txt'):
             tags = [str(i) for i in rfid_tags]
-            tags = ','.join(tags)
-            with open(self.path+'/logs.txt','w') as f:
-                 file.write(f'mice:{n_mice}')
-                 for tag in rfid_tags:
-                    file.write(f'Tags: {tags}')
+            if len(tags)>1:
+                tags = ','.join(tags)
+            else:
+                tags = tags[0]
+            with open(self.path+'/logs.txt','w') as file:
+                file.write(f'mice:{n_mice}\n')
+                 #for tag in rfid_tags:
+                file.write(f'Tags: {tags}')
+        with open(path+'/'+'logs.txt','r') as f:
+            tags=f.readlines()
+            self.tags=[int(i) for i in tags[1][6:].split(',')]
         return
     def load_data(self):
         convert_dict={'sort_tracks':eval,'RFID_tracks':eval,'ious_interaction':eval,
@@ -59,12 +62,12 @@ class PRT_analysis:
         yolov4_detect_vid(self.path,self.config_dic_detect,write_vid)
         return
     def load_RFID(self):
-        try:
-            self.df_RFID=mm.RFID_readout(self.path,self.config_dic_analysis,len(self.tags))
-        except Exception as e:
-            print(e)
-            print('Confirm correct folder path')
-            sys.exit(0)
+        #try:
+        self.df_RFID=mm.RFID_readout(self.path,self.config_dic_analysis,int(len(self.tags)))
+        #except Exception as e:
+        #    print(e)
+        #    print('Confirm correct folder path')
+            #sys.exit(0)
         if len(self.tags) !=1:
             n_RFID_readings=len(self.df_RFID[self.df_RFID['RFID_readings'].notnull()])
         else:
