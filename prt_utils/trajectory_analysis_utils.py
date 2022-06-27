@@ -5,6 +5,7 @@ import math
 import cv2
 from prt_utils.track_utils import *
 from collections import ChainMap
+import traja
 
 def get_track(tracks,tag):
     tag_track=[v for v in tracks if v[4]==tag]
@@ -91,6 +92,7 @@ def dbpts2xy(dbpts_track):
 
 
 def traja_process(df):
+    print()
     df_speed=df.traja.get_derivatives()
     df_speed['frame']=df.frame.values
     df.traja.calc_turn_angle()
