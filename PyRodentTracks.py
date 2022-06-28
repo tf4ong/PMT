@@ -7,7 +7,7 @@ import prt_utils.configloader as config_loader
 import sys
 from prt_utils.track_utils import *
 import itertools
-from prt_utils.generate_vid import generate_RFID_video,create_validation_Video
+from prt_utils.generate_vid import generate_RFID_video,create_validation_Video,generate_video
 from prt_utils.detect_utils import yolov4_detect_vid
 from tqdm import tqdm
 import warnings
@@ -199,6 +199,8 @@ class PRT_analysis:
         
     def generate_validation_video(self,out_folder='None'):
         create_validation_Video(self.path,self.df_tracks_out,self.tags,self.config_dic_analysis,output=None)
+    def generate_track_video(self,out_folder='None'):
+        generate_video(self.path,self.df_tracks_out,self.tags,self.config_dic_analysis,output=None)
 
 import shutil
 from prt_utils.extract_frames2label import extract_frames
