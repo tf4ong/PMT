@@ -18,7 +18,7 @@ may need adiitionl methods for faster inference if long videos
 faster framerate mayhelp, only tested upto 40fps
 """
 class PRT_analysis:
-    def __init__(self,path,config_path,n_mice,rfid_tags):
+    def __init__(self,path,config_path,n_mice=None,rfid_tags=None):
         self.path=path 
         self.config_path=config_path
         self.config_dic_analysis=config_loader.analysis_config_loader(config_path)
@@ -33,16 +33,17 @@ class PRT_analysis:
             #    self.load_data()
             #else:
             #    pass
-        if not os.path.exists(self.path+'/logs.txt'):
-            tags = [str(i) for i in rfid_tags]
-            if len(tags)>1:
-                tags = ','.join(tags)
-            else:
-                tags = tags[0]
-            with open(self.path+'/logs.txt','w') as file:
-                file.write(f'mice:{n_mice}\n')
-                 #for tag in rfid_tags:
-                file.write(f'Tags: {tags}')
+        if rfid_tags is not None and n_mice is not None:
+            if not os.path.exists(self.path+'/logs.txt'):
+                tags = [str(i) for i in rfid_tags]
+                if len(tags)>1:
+                    tags = ','.join(tags)
+                else:
+                    tags = tags[0]
+                with open(self.path+'/logs.txt','w') as file:
+                    file.write(f'mice:{n_mice}\n')
+                     #for tag in rfid_tags:
+                    file.write(f'Tags: {tags}')
         with open(path+'/'+'logs.txt','r') as f:
             tags=f.readlines()
             self.tags=[int(i) for i in tags[1][6:].split(',')]
