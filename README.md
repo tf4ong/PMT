@@ -85,3 +85,7 @@ For full videos, please access the following [Link](https://youtube.com/playlist
 For detailed setup/use guide, please refer to the PyMouseTracks Setup_Use Guide pdf in the current repository.
 Trainning can be done on the cloud (please refer to the notebooks folder) or using docker. 
 To pull docker image, enter the following command: docker pull tf4ong/darknet:latest.
+
+
+
+###Sample Weights and data can be found at [osf]https://osf.io/78akz/
