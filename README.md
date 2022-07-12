@@ -88,4 +88,4 @@ To pull docker image, enter the following command: docker pull tf4ong/darknet:la
 
 
 
-###Sample Weights and data can be found at [osf]https://osf.io/78akz/
+###Sample Weights and data can be found at [osf](https://osf.io/78akz/)
