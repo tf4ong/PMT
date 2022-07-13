@@ -367,6 +367,7 @@ def interaction2dic(df_tracks_out,tags,slack):
 
 
 def spontanuous_bb_remover(reconnect_ids,df_tracks,config_dict_analysis,config_dict_tracking):
+    # removes fast appearing bbs , usually false negatives
     iou_min_bb=config_dict_tracking['iou_min_sbb_checker']
     RFID_coords=config_dict_analysis['RFID_readers']
     fpbb_thres=config_dict_tracking['sbb_frame_thres']

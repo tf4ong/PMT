@@ -20,7 +20,10 @@ def generate_RFID_video(path,df_RFID,tags,df_tracks_out,validation_frames,config
     frame_count=0
     RFID_coords=config_dict_analysis['RFID_readers']
     entrance_reader=config_dict_analysis['entrance_reader']
-    vid=cv2.VideoCapture(path+'/raw.avi')
+    vid = path+'/raw.avi'
+    if not os.path.exists(vid):
+        vide = path+'/raw.mp4'
+    #vid=cv2.VideoCapture(path+'/raw.avi')
     fps = int(vid.get(cv2.CAP_PROP_FPS))
     codec = cv2.VideoWriter_fourcc(*'XVID')
     width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -173,7 +176,10 @@ def create_validation_Video(folder,df1,tags,config_dic,output=None,plot_readers=
     md_frames=[frame for frame in match_details.keys()]
     #corrections=df1.Correction.values
     #matched=df1.RFID_matched.values
-    vid=cv2.VideoCapture(folder+'/raw.mp4')
+    vid = folder+'/raw.avi'
+    if not os.path.exists(vid):
+        vide = folder+'/raw.mp4'
+    #vid=cv2.VideoCapture(folder+'/raw.mp4')
     vid_length=int(vid.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = int(vid.get(cv2.CAP_PROP_FPS))
     codec = cv2.VideoWriter_fourcc(*'XVID')
@@ -352,6 +358,9 @@ def generate_video(folder,df1,tags,config_dic,output=None,plot_readers=False):
     matched_frames=[frame for frame in matched.keys()]
     match_details={i:v for i,v in enumerate(df1.Matching_details.values) if v!= []}
     md_frames=[frame for frame in match_details.keys()]
+    vid = folder+'/raw.avi'
+    if not os.path.exists(vid):
+        vide = folder+'/raw.mp4'
     vid=cv2.VideoCapture(folder+'/raw.mp4')
     vid_length=int(vid.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = int(vid.get(cv2.CAP_PROP_FPS))
