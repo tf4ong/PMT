@@ -1,4 +1,4 @@
-# PyRodentTracks(PRT)
+# PyMouseTracks(PMT)
 - A integration of Yolov4-tf2, SORT, RFID detections tracking mice
 - To analyze data generated from [PSYCO recording software on raspnberry pi](https://github.com/tf4ong/tracker_rpi)
 - Data analyzed offline using a pc/cloud notebook with cuda capable GPU
@@ -71,8 +71,21 @@ Increase arena size and RFID readers connected to track more mice. The limit is 
 ##### White Mice in 3 Chamber Arena (White Background) 
 ![](imgs/3chamber.PNG)
 ##### Custom Home Cage Tracking
+
+
+
+
+
+
 ![](imgs/Home_cage_tracks.PNG)
 
 
 For full videos, please access the following [Link](https://youtube.com/playlist?list=PLmcjDqLt_Xk6AAlll3ztvgNI9P3yQxPc2) on youtube.
 
+For detailed setup/use guide, please refer to the PyMouseTracks Setup_Use Guide pdf in the current repository.
+Trainning can be done on the cloud (please refer to the notebooks folder) or using docker. 
+To pull docker image, enter the following command: docker pull tf4ong/darknet:latest.
+
+
+
+###Sample Weights and data can be found at [osf](https://osf.io/78akz/)
