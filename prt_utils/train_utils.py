@@ -26,22 +26,22 @@ def generate_sets(vid_fold,train_frac,dest):
     set_text(test_ims,'test',dest)
     for i in train_ims:
         textfile = f'{i[:-4]}.txt'
+        shutil.copyfile(f'{vid_fold}/{i}', f'{dest}train_set/{i}')
         try:
             shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}train_set/{textfile }')
         except Exception as e:
             open(f'{dest}train_set/{i[:-4]}.txt','w').close()
-            shutil.copyfile(f'{vid_fold}/{i}', f'{dest}train_set/{i}')
-            continue
-        shutil.copyfile(f'{vid_fold}/{i}', f'{dest}train_set/{i}')
+            #shutil.copyfile(f'{vid_fold}/{i}', f'{dest}train_set/{i}')
+            continue 
     for i in test_ims:
         textfile = f'{i[:-4]}.txt'
+        shutil.copyfile(f'{vid_fold}/{i}', f'{dest}test_set/{i}')
         try:
-            shutil.copyfile(f'{vid_fold}/{i}', f'{dest}test_set/{i}')
+            shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}test_set/{textfile }')
         except Exception as e:
             open(f'{dest}test_set/{i[:-4]}.txt','w').close()
-            shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}test_set/{textfile }')
+            #shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}test_set/{textfile }')
             continue
-        shutil.copyfile(f'{vid_fold}/{textfile }', f'{dest}test_set/{textfile }')
 
 
 def generate_pathtext(path,nclass):
