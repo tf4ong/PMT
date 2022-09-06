@@ -11,8 +11,8 @@ config_path = '/media/tony/data/data/large_tracker_trainning/config.ini'
 
 path='/mnt/team/TM_Lab/Tony/stroke_3d_cylinder/tracker_cage/BJ/'
 
-folders=['2022-08-19_16-13-19','2022-08-20_16-48-44','2022-08-21_16-22-57','2022-08-22_16-34-54','2022-08-23_15-41-55']
-
+folders=['2022-08-19_16-13-19']#,'2022-08-20_16-48-44']#,'2022-08-21_16-22-57','2022-08-22_16-34-54','2022-08-23_15-41-55']
+#folders=['2022-08-20_16-48-44']
 for i in folders:
     temp = prt.PRT_analysis(path+i,config_path,3,rfid_tags)
     #temp.detect_mice()

@@ -79,7 +79,7 @@ class PRT_analysis:
         self.df_tracks=mm.read_yolotracks(self.path,self.config_dic_analysis,self.config_dic_tracking,
                                           self.df_RFID,len(self.tags))
         if self.config_dic_analysis['entrance_reader'] is None:
-            self.df_tracks=mm.reconnect_tracks_ofa(self.df_tracks,len(self.tags))
+            #self.df_tracks=mm.reconnect_tracks_ofa(self.df_tracks,len(self.tags))
             pass
         else:
             reconnect_ids=mm.get_reconnects(self.df_tracks)

@@ -21,7 +21,10 @@ def read_match_frames(path):
     return df
 
 def get_frame(path,frame_count):
-    cap=cv2.VideoCapture(path+'/raw.avi')
+    if os.path.exists(path+'/raw.avi'):
+        cap=cv2.VideoCapture(path+'/raw.avi')
+    else:
+        cap=cv2.VideoCapture(path+'/raw.mp4')
     cap.set(1,frame_count)
     ret, frame = cap.read()
     cap.release()
