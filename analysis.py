@@ -1,20 +1,23 @@
-import PyRodentTracks as PRT
-from absl import app, flags, logging
-from absl.flags import FLAGS
+import os
+import pandas as pd
+import numpy as np
+#from tensorflow.python.client import device_lib
+import PyRodentTracks as prt
+#print(device_lib.list_local_devices())
 
-flags.DEFINE_string('folder_path', 'None', 'path to video folder to analyze')
-flags.DEFINE_string('config_path', 'None','path to config file')
-flags.DEFINE_integer('n_moue', 0, 'Number of mouse in video')
-flags.DEFINE_string('RFID tags', 'None','RFID tags of all mice in video separated by a comma')
+rfid_tags=[34443625031,141868466231,34443624660]
+config_path = '/media/tony/data/data/large_tracker_trainning/config.ini'
 
 
-def main(_argv):
-    rfid_tags = [int(i) for i in FLAGS.]
-    temp = PRT.PRT_analysis(FLAGS.folder_path,FLAGS.config_path,)
-    temp.detect_mice()
+path='/mnt/team/TM_Lab/Tony/stroke_3d_cylinder/tracker_cage/BJ/'
+
+folders=['2022-08-19_16-13-19','2022-08-20_16-48-44','2022-08-21_16-22-57','2022-08-22_16-34-54','2022-08-23_15-41-55']
+
+for i in folders:
+    temp = prt.PRT_analysis(path+i,config_path,3,rfid_tags)
+    #temp.detect_mice()
     temp.load_RFID()
     temp.load_dets()
     temp.RFID_match()
     temp.find_activte_mice()
     temp.compile_travel_trjectories()
-    temp.generate_track_video()

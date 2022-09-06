@@ -11,10 +11,11 @@ flags.DEFINE_integer('frame_count', 1, 'The frame to mark the RFID readers')
 
 
 def main(_argv):
-    cap=cv2.VideoCapture(FLAGS.vid_path+'/raw.avi')
+    cap=cv2.VideoCapture(FLAGS.vid_path+'/raw.mp4')
     print(FLAGS.vid_path)
     cap.set(1,FLAGS.frame_count)
     ret, frame = cap.read()
+    print(frame.shape)
     count=FLAGS.reader_count
     n_select=0
     RFID_coords={}

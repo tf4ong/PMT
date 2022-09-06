@@ -33,7 +33,6 @@ def interaction_correcter(tags,iou_dic,nmice):
     else:
        checker={sid:sids for sid,sids in iou_dic.items()}
        keys=list(checker.keys())
-       print('1')
        if checker[keys[0]]==[keys[1]]:
            dic_return={sid:[] for sid in tags}
            for tag in tags:

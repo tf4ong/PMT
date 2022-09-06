@@ -40,6 +40,7 @@ def RFID_readout(pathin,config_dict_analysis,n_mice):
             starttime=float(first_line[10:-2])
             df2['Time']=df2['timestamp'] + starttime
     else:
+        print(config_dict_analysis)
         ent_reader=config_dict_analysis['entrance_reader']
         time_thresh=config_dict_analysis['entrance_time_thres']
         try:
@@ -55,15 +56,16 @@ def RFID_readout(pathin,config_dict_analysis,n_mice):
             df2['Time']=df2['Time'].astype(np.int64)/10**9
         except Exception:
             df2=pd.read_csv(f'{pathin}/timestamps.csv',index_col=False,skiprows=1)
-            df2['timestamp']=(df2['timestamp']-df2.iloc[0]['timestamp'])/1000000
+            df2['Timestamp']=(df2['Timestamp']-df2.iloc[0]['Timestamp'])/1000000
             with open(f'{pathin}/timestamps.csv') as f:
                 first_line = f.readline()
             starttime=float(first_line[10:-2])
-            df2['Time']=df2['timestamp'] + starttime
+            df2['Time']=df2['Timestamp'] + starttime
         #print(df1.columns)
-        df_ent_reader=df1.query(f'Reader =={str(ent_reader)}')
-        ent_times=df_ent_reader.diff(axis=0)#.Timestamp.apply(lambda x: x.total_seconds())
-        df1=df1.drop(df1.index[ent_times[ent_times.Timestamp<time_thresh].index],inplace=False)
+        if ent_reader is not None:
+            df_ent_reader=df1.query(f'Reader =={str(ent_reader)}')
+            ent_times=df_ent_reader.diff(axis=0)#.Timestamp.apply(lambda x: x.total_seconds())
+            df1=df1.drop(df1.index[ent_times[ent_times.Timestamp<time_thresh].index],inplace=False)
         df1['Readings']=df1.drop(columns=['Timestamp']).values.tolist()
         df1=df1.reset_index()
         df2=df2.reset_index()
@@ -90,7 +92,7 @@ def RFID_readout(pathin,config_dict_analysis,n_mice):
         except Exception:
             pass
         df2['frame']=range(len(df2))
-    print(df2.columns)
+    #print(df2.columns)
     return df2
 
 def sort_tracks_generate(bboxes,resolution,area_thres,max_age,min_hits,iou_threshold,n_mice):
@@ -482,8 +484,8 @@ def Combine_RFIDreads(df,df_RFID_cage):
     length=min([len(df),len(df_RFID_cage)])
     df=df[:length]
     df_RFID_cage=df_RFID_cage[:length]
-    print(df_RFID_cage.columns)
-    print(df.columns)
+    #print(df_RFID_cage.columns)
+    #print(df.columns)
     df=pd.merge(df,df_RFID_cage, on='frame')
     df['RFID_tracks']=[list() for i in range(len(df.index))]
     df['RFID_matched']=[list() for i in range(len(df.index))]
@@ -869,8 +871,8 @@ def bbox_revised(df_tracks,df_RFID,RFID_coords,entrance_reader,thresh,threshold,
                         try:
                             current_ids=tracks[i][:,4]
                         except Exception:
-                            print(tracks[i])
-                            print(type(tracks[i]))
+                            #print(tracks[i])
+                            #print(type(tracks[i]))
                             import sys
                             sys.exit()
                     if len(tracks[i-1]) ==0:
