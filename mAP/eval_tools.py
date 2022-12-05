@@ -156,7 +156,7 @@ def average_precision(rec, prec):
     ----------
     ap as float
     """
-    if rec is None or prec is None:
+    if rec == [None] or prec == [None]:
         return np.nan
 
     # append sentinel values at both ends
