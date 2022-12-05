@@ -1,4 +1,5 @@
 jupyter
+tensorflow-gpu==2.3.1
 opencv-python==4.1.1.26
 scikit-image
 filterpy
@@ -26,3 +27,10 @@ labelImg
 numpy==1.18.5
 pyqtwebengine
 ffmpy
+lxml
+tqdm
+absl-py
+easydict
+pillow
+filterpy
+imutils
