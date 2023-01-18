@@ -64,7 +64,7 @@ def RFID_readout(pathin,config_dict_analysis,n_mice):
         #print(df1.columns)
         if ent_reader is not None:
             df_ent_reader=df1.query(f'Reader =={str(ent_reader)}')
-            ent_times=df_ent_reader.diff(axis=0)#.Timestamp.apply(lambda x: x.total_seconds())
+            ent_times=df_ent_reader.diff()#.Timestamp.apply(lambda x: x.total_seconds())
             df1=df1.drop(df1.index[ent_times[ent_times.Timestamp<time_thresh].index],inplace=False)
         df1['Readings']=df1.drop(columns=['Timestamp']).values.tolist()
         df1=df1.reset_index()

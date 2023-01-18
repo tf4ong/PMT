@@ -89,8 +89,8 @@ def gt_predicts_numpy(gt,predicts):
             
             order = pred_scores_each_f.reshape(-1).argsort()[::-1]
         except Exception as e:
-            print(e)
-            print('no text file found continuing')
+            #print(e)
+            #print('no text file found continuing')
             continue
         
         
@@ -124,14 +124,22 @@ def bbox_iou(bbox_a, bbox_b, offset=0):
     """
     if bbox_a.shape[1] < 4 or bbox_b.shape[1] < 4:
         raise IndexError("Bounding boxes axis 1 must have at least length 4")
+    if bbox_b.shape[0] == 0 and bbox_a.shape[0] == 0:
+        return np.array([])
+    elif bbox_a.shape[0] == 0 and bbox_b.shape[0] != 0:
+        #return np.zeros((1,bbox_b.shape[0]))
+        return np.array([])
+    elif bbox_a.shape[0] != 0 and bbox_b.shape[0] == 0:
+        return np.zeros((bbox_a.shape[0],1))
+        
+    else:
+        tl = np.maximum(bbox_a[:, None, :2], bbox_b[:, :2])
+        br = np.minimum(bbox_a[:, None, 2:4], bbox_b[:, 2:4])
 
-    tl = np.maximum(bbox_a[:, None, :2], bbox_b[:, :2])
-    br = np.minimum(bbox_a[:, None, 2:4], bbox_b[:, 2:4])
-
-    area_i = np.prod(br - tl + offset, axis=2) * (tl < br).all(axis=2)
-    area_a = np.prod(bbox_a[:, 2:4] - bbox_a[:, :2] + offset, axis=1)
-    area_b = np.prod(bbox_b[:, 2:4] - bbox_b[:, :2] + offset, axis=1)
-    return area_i / (area_a[:, None] + area_b - area_i)
+        area_i = np.prod(br - tl + offset, axis=2) * (tl < br).all(axis=2)
+        area_a = np.prod(bbox_a[:, 2:4] - bbox_a[:, :2] + offset, axis=1)
+        area_b = np.prod(bbox_b[:, 2:4] - bbox_b[:, :2] + offset, axis=1)
+        return area_i / (area_a[:, None] + area_b - area_i)
 
 def flat_array(pred_scores, match ,gt_difficult):
     n_pos = 0
@@ -156,9 +164,10 @@ def average_precision(rec, prec):
     ----------
     ap as float
     """
-    if rec == [None] or prec == [None]:
+    if (rec == [None]).all() or (prec == [None]).all():
         return np.nan
-
+    #print(rec)
+    #print(prec)
     # append sentinel values at both ends
     mrec = np.concatenate(([0.], rec, [1.]))
     mpre = np.concatenate(([0.], np.nan_to_num(prec), [0.]))
@@ -186,9 +195,11 @@ def calculate_match(pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels,gt_d
         #order = pred_score_l.argsort()[::-1]
     
         iou = bbox_iou(pred_bboxes_f,gt_bboxes_f)
+        if not iou.size > 0 :
+            continue
+        #print('iou',iou)
         #gt_difficult = np.zeros(gt_bboxes_f.shape[0])
         gt_index = iou.argmax(axis=1)
-        #print(gt_index)
         gt_index[iou.max(axis=1) < iou_thresh] = -1
         del iou
     
@@ -206,6 +217,37 @@ def calculate_match(pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels,gt_d
         match.append(match_f)
     return match
 
+def recall_prec(score_flat,match_flat,n_pos):
+    """ get recall and precision from internal records """
+    n_fg_class = 1 #max(self._n_pos.keys()) + 1 # we only have one class "mouse"
+    prec = [None] * n_fg_class
+    rec = [None] * n_fg_class
+    score_l = np.array(score_flat)
+    match_l = np.array(match_flat, dtype=np.int32)
+    order = score_l.argsort()[::-1]
+    match_l = match_l[order]
+    tp = np.cumsum(match_l == 1)
+    fp = np.cumsum(match_l == 0)
+    #print(tp,fp)
+    # If an element of fp + tp is 0,
+    # the corresponding element of prec[l] is nan.
+    with np.errstate(divide='ignore', invalid='ignore'):
+        prec = tp / (fp + tp)
+        # post-processing, if tp = fp =0, set prec = 1,
+        idx_nan_prec = np.intersect1d(np.where(fp == 0)[0],np.where(tp == 0)[0])
+        prec[idx_nan_prec] = 1.
+    # If n_pos[l] is 0, rec[l] is None.
+    #if n_pos > 0:
+    with np.errstate(divide='ignore', invalid='ignore'):
+        rec = tp / n_pos
+        # post-processing, if tp = n_pos =0, set prec = 1,
+        idx_nan_rec = np.intersect1d(np.where(tp == 0)[0],np.where(n_pos == 0)[0])
+        rec[idx_nan_rec] = 1.
+    total_fp = np.sum(match_l==0)
+    total_fn = n_pos - np.sum(match_l==1)
+    return rec, prec,total_fp,total_fn
+
+'''
 def recall_prec(score_flat,match_flat,n_pos):
     """ get recall and precision from internal records """
     n_fg_class = 1 #max(self._n_pos.keys()) + 1 # we only have one class "mouse" 
@@ -234,14 +276,17 @@ def recall_prec(score_flat,match_flat,n_pos):
     total_fn = n_pos - np.sum(match_l==1)
     
     return rec, prec,total_fp,total_fn  
-
+'''
 def get_mAP(gt_dic,predict_dic):
     #can only do one class right now
     # will implement mutiple object (different mice and objects,food,etc) in the future or if anyone is interested
     pred_bboxes, pred_labels,pred_scores, gt_bboxes,gt_labels,gt_difficult=gt_predicts_numpy(gt_dic,predict_dic)
     match = calculate_match(pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels,gt_difficult)
+    
     score_flat,match_flat,n_pos = flat_array(pred_scores, match ,gt_difficult)
+    #print(score_flat,match_flat,n_pos)
     rec, prec,total_fp,total_fn= recall_prec(score_flat,match_flat,n_pos)
+    #print('rec shape',rec.shape)
     mean_ap = average_precision(rec,prec)
     return total_fn,total_fp,mean_ap
 

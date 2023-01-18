@@ -34,3 +34,4 @@ easydict
 pillow
 filterpy
 imutils
+rdp
