@@ -6,6 +6,8 @@ import cv2
 from prt_utils.track_utils import *
 from collections import ChainMap
 import traja
+from rdp import rdp
+
 
 def get_track(tracks,tag):
     tag_track=[v for v in tracks if v[4]==tag]
@@ -85,14 +87,16 @@ def dbpts2xy(dbpts_track):
         tracks=tracks.drop(columns=[dbpt])
     return tracks
 
-
-
-
-
-
+def simplify_traj(df_tr,epsilon=10):
+    #df_tr = pd.read_csv(df_path, header=[0])
+    traj = list(zip(df_tr.x, df_tr.y))
+    simplified_trajectory = rdp(traj, epsilon=10, algo="iter", return_mask=True)
+    df_tr['simplified_traj']= simplified_trajectory 
+    df_tr.drop(df_tr[df_tr['simplified_traj'] == False].index, inplace=True)
+    df_tr=df_tr.drop(columns=['simplified_traj'])
+    return df_tr
 
 def traja_process(df):
-    print()
     df_speed=df.traja.get_derivatives()
     df_speed['frame']=df.frame.values
     df.traja.calc_turn_angle()
@@ -143,8 +147,6 @@ def add_interpolation(bboxes,lost_tracks,RFID_tracks,tag,bbox,iou_thresh=0.25):
         
         
 def add_interpolation_df(frame,dic,bboxes,lost_tracks,RFID_tracks,tag,iou_thresh=0.1):
-    #print(RFID_tracks)
-    #print(type(RFID_tracks))
     if frame not in dic.keys():
         return bboxes, RFID_tracks
     else:
