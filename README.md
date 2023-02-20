@@ -72,9 +72,6 @@ Increase arena size and RFID readers connected to track more mice. The limit is 
 ![](imgs/3chamber.PNG)
 ##### Custom Home Cage Tracking
 
-#Please lookforward to our next update to using [Yolov7](https://github.com/WongKinYiu/yolov7)
-#The update will enable trainning to done fully in python. 
-
 
 
 
@@ -90,3 +87,6 @@ To pull docker image, enter the following command: docker pull tf4ong/darknet:la
 
 
 ###Sample Weights and data can be found at [osf](https://osf.io/78akz/)
+#Please lookforward to our next update to using [Yolov7](https://github.com/WongKinYiu/yolov7)
+#The update will enable trainning to done fully in python. 
+
