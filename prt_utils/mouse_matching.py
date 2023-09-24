@@ -1220,6 +1220,8 @@ def match_left_over_tag(df,tags,config_dict_analysis):
     loop_count=1
     while True:
         index_list=get_left_over_tag_indexes(df,tags)
+        if len(index_list) == 0:
+            break
         index_list_refined=refine_frame_left_list(index_list,df)
         msg=f'Starting Left over Tag match comphrensive loop {loop_count}'
         pbar=tqdm(total=len(index_list_refined),position=0,leave=True,desc=msg)
